@@ -11,12 +11,11 @@ object Main {
     val elapsed = measureTimeMillis {
       process("", words)?.let { println ("found ${it.chunked(5)}") }
     }
-    println("Elasped = ${elapsed/1000.0}")
+    println("Time: $elapsed ms")
   }
 
   private fun process(current: String, words: List<String>): String? {
-    if (current.length >= 25)
-      return current
+    if (current.length >= 25) return current
     val letter = LETTER_FREQUENCIES.first { !current.contains(it) }
     val parts = words.partition { it.contains(letter) }
     return parts.first.firstNotNullOfOrNull {
