@@ -38,7 +38,6 @@ object Main {
 
   private fun pickWord(words: List<String>, letter: Char): String? = words.firstOrNull { it.contains(letter) }
 
-
   private const val LETTER_FREQUENCIES = "etaonrishdlfcmugypwbvkjxzq"
 }
 
