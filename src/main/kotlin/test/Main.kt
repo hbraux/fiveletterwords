@@ -7,36 +7,28 @@ import kotlin.system.measureTimeMillis
 object Main {
 
   @JvmStatic fun main(args : Array<String>) {
-    val words = File("words.txt").readLines().filterNot { it.length != it.toSet().size }.toMutableList()
+    val words = File("words.txt").readLines().filterNot { it.length != it.toSet().size }.toList()
     val elapsed = measureTimeMillis {
-      process(words)?.let { println ("found ${it.chunked(5)}") }
+      process("", words)?.let { println ("found ${it.chunked(5)}") }
     }
     println("Elasped = ${elapsed/1000.0}")
   }
 
-  private fun process(words: MutableList<String>): String? {
-    LETTER_FREQUENCIES.forEach { letter ->
-      while (words.isNotEmpty()) {
-        val word = pickWord(words, letter) ?: break
-        findNext(word, words)?.let { return(it) }
-        words.remove(word)
-        println("Remaining: ${words.size}")
-      }
-    }
-    return null
+  private fun List<String>.filter(word: String): List<String> {
+    val charset = word.toSet()
+    return this.filterNot { w -> w.any { charset.contains(it) } }
   }
 
-  private fun findNext(current: String, words: List<String>): String? {
-    if (current.length >= 22)
+  private fun process(current: String, words: List<String>): String? {
+    if (current.length >= 25)
       return current
-    val wordchars = current.toSet()
-    val filtered = words.filterNot { w -> w.any { wordchars.contains(it) } }
-    return filtered.firstNotNullOfOrNull {
-      findNext(it + current, filtered)
+    val letter = LETTER_FREQUENCIES.first { !current.contains(it) }
+    val parts = words.partition { it.contains(letter) }
+    return parts.first.firstNotNullOfOrNull {
+      word -> process(word + current, parts.second.filter(word))
     }
   }
 
-  private fun pickWord(words: List<String>, letter: Char): String? = words.firstOrNull { it.contains(letter) }
 
   private const val LETTER_FREQUENCIES = "etaonrishdlfcmugypwbvkjxzq"
 }
