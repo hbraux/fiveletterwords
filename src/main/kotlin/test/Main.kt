@@ -14,21 +14,15 @@ object Main {
     println("Elasped = ${elapsed/1000.0}")
   }
 
-  private fun List<String>.filter(word: String): List<String> {
-    val charset = word.toSet()
-    return this.filterNot { w -> w.any { charset.contains(it) } }
-  }
-
   private fun process(current: String, words: List<String>): String? {
     if (current.length >= 25)
       return current
     val letter = LETTER_FREQUENCIES.first { !current.contains(it) }
     val parts = words.partition { it.contains(letter) }
     return parts.first.firstNotNullOfOrNull {
-      word -> process(word + current, parts.second.filter(word))
+      word -> process(word + current, parts.second.filterNot { w -> w.any { word.contains(it) } })
     }
   }
-
 
   private const val LETTER_FREQUENCIES = "etaonrishdlfcmugypwbvkjxzq"
 }
