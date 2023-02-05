@@ -2,3 +2,4 @@
 /out/
 /rust/target/
 /target/
+/rust/Cargo.lock
