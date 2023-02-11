@@ -8,19 +8,23 @@ static LETTERS: &[u8] = "etaonrishdlfcmugypwbvkjxzq".as_bytes();
 fn main() {
     let words: Vec<String> = read_lines("../words.txt").expect("cannot read file")
         .into_iter().filter(|w| !has_duplicate(w)).collect();
+    let mut pwords: Vec<&String> = Vec::new();
+    for w in words.iter() {
+        pwords.push(&w);
+    }
     let before = Instant::now();
-    let res = process("".to_string(), words);
+    let res = process("".to_string(), pwords);
     println!("Result: {} in {:.2?} s", res, before.elapsed());
 }
 
-fn process(current: String, words: Vec<String>) -> String {
+fn process(current: String, words: Vec<&String>) -> String {
     if current.len() >= 25 {
         return current;
     }
     let letter = LETTERS.into_iter().find(|b| !current.as_bytes().contains(b)).unwrap();
     let (first, second): (Vec<_>, Vec<_>) = words.into_iter().partition(|w| has_letter(w, letter));
     for word in first {
-        let filtered: Vec<String> = second.clone().into_iter().filter(|w| !share_letters(w, &word)).collect();
+        let filtered: Vec<&String> = second.clone().into_iter().filter(|w| !share_letters(w, &word)).collect();
         let found = process(current.clone() +  &word, filtered);
         if !found.is_empty() {
             return found;
