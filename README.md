@@ -32,3 +32,5 @@ represents a letter, and a simple AND would detect duplicate letters.
 * The code is small, short and easy to understand. The performances are quite good (~1500ms)
 
 ### Rust
+
+* Being a newbie, the code may not be perfect for an experienced "Rustian".
