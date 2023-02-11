@@ -14,7 +14,7 @@ fn main() {
 }
 
 fn process(current: String, words: Vec<String>) -> String {
-    if current.len() >= 20 {
+    if current.len() >= 25 {
         return current;
     }
     let letter = LETTERS.into_iter().find(|b| !current.as_bytes().contains(b)).unwrap();
