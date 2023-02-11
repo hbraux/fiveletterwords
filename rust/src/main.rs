@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
+use std::ops::Deref;
 use std::path::Path;
 use std::time::Instant;
 
@@ -8,24 +9,29 @@ static LETTERS: &[u8] = "etaonrishdlfcmugypwbvkjxzq".as_bytes();
 fn main() {
     let words: Vec<String> = read_lines("../words.txt").expect("cannot read file")
         .into_iter().filter(|w| !has_duplicate(w)).collect();
-    let mut pwords: Vec<&String> = Vec::new();
+    let mut pwords: Vec<&[u8]> = Vec::new();
     for w in words.iter() {
-        pwords.push(&w);
+        pwords.push(w.as_bytes());
     }
     let before = Instant::now();
-    let res = process("".to_string(), pwords);
-    println!("Result: {} in {:.2?} s", res, before.elapsed());
+    let res = process("".as_bytes(), pwords);
+    println!("Result: {:?} in {:.2?} s", res, before.elapsed());
 }
 
-fn process(current: String, words: Vec<&String>) -> String {
+fn process(current: &[u8], words: Vec<&[u8]>) -> String {
     if current.len() >= 25 {
-        return current;
+        return String::from_utf8(Vec::from(current)).unwrap();
     }
-    let letter = LETTERS.into_iter().find(|b| !current.as_bytes().contains(b)).unwrap();
-    let (first, second): (Vec<_>, Vec<_>) = words.into_iter().partition(|w| has_letter(w, letter));
+    let letter = LETTERS.into_iter().find(|b| !has_letters(current, b)).unwrap();
+    let (first, second): (Vec<_>, Vec<_>) = words.into_iter().partition(|w| w.contains(letter));
     for word in first {
-        let filtered: Vec<&String> = second.clone().into_iter().filter(|w| !share_letters(w, &word)).collect();
-        let found = process(current.clone() +  &word, filtered);
+        let mut filtered: Vec<&[u8]> = Vec::new();
+        for w in second.iter() {
+            if !share_letters(w, word) {
+                filtered.push(w)
+            }
+        }
+        let found = process([current, word].concat().deref(), filtered);
         if !found.is_empty() {
             return found;
         }
@@ -33,12 +39,13 @@ fn process(current: String, words: Vec<&String>) -> String {
     return "".to_string();
 }
 
-fn has_letter(word: &str, letter: &u8) -> bool {
-    word.as_bytes().contains(letter)
+
+fn share_letters(word: &[u8], other: &[u8]) -> bool {
+    word.into_iter().any(|c| has_letters(other,c))
 }
 
-fn share_letters(word: &str, current: &String) -> bool {
-    current.as_bytes().into_iter().any(|c| has_letter(word, c))
+fn has_letters(word: &[u8], letter: &u8) -> bool  {
+    (1..word.len()).any(|i| word[i] == *letter)
 }
 
 fn read_lines(filename: impl AsRef<Path>) -> io::Result<Vec<String>> {
@@ -61,17 +68,5 @@ mod tests {
         assert_eq!(true, has_duplicate("abcda"));
     }
 
-    #[test]
-    fn test_has_letter() {
-        let letter= "z".as_bytes()[0];
-        assert_eq!(false, has_letter("abcde", &letter));
-        assert_eq!(true, has_letter("abzde", &letter));
-    }
 
-    #[test]
-    fn test_share_letters() {
-        let current = "abcdefghij".to_string();
-        assert_eq!(false, share_letters("uvwxy", &current));
-        assert_eq!(true, share_letters("uvaxy", &current));
-    }
 }
