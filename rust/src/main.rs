@@ -6,6 +6,7 @@ use std::time::Instant;
 
 static LETTERS: &[u8] = "etaonrishdlfcmugypwbvkjxzq".as_bytes();
 
+
 fn main() {
     let words: Vec<String> = read_lines("../words.txt").expect("cannot read file")
         .into_iter().filter(|w| !has_duplicate(w)).collect();
@@ -20,14 +21,14 @@ fn main() {
 
 fn process(current: &[u8], words: Vec<&[u8]>) -> Option<String> {
     if current.len() >= 25 {
-        return Some(String::from_utf8(Vec::from(current)).unwrap());
+        return Some(String::from_utf8(Vec::from(current)).unwrap())
     }
     let letter = LETTERS.into_iter().find(|b| !has_letters(current, b)).unwrap();
     let (first, second): (Vec<_>, Vec<_>) = words.into_iter().partition(|w| w.contains(letter));
     for word in first {
-        if let Some(found) = process([current, word].concat().deref(),
-                                 second.clone().into_iter().filter(|w| !share_letters(w, word)).collect()) {
-            return Some(found)
+        // could be even faster without the clone
+        if let Some(x) = process([current, word].concat().deref(), second.clone().into_iter().filter(|w| !share_letters(w, word)).collect()) {
+            return Some(x)
         }
     }
     return None
@@ -61,6 +62,10 @@ mod tests {
         assert_eq!(true, has_duplicate("abccd"));
         assert_eq!(true, has_duplicate("abcda"));
     }
-
-
+    #[test]
+    fn test_share_letters() {
+        let word = "abcdefghi".as_bytes();
+        assert_eq!(false, share_letters(word, "mnopq".as_bytes()));
+        assert_eq!(true, share_letters(word, "mnapq".as_bytes()));
+    }
 }

@@ -7,7 +7,7 @@ import kotlin.system.measureTimeMillis
 object Main {
 
   @JvmStatic fun main(args : Array<String>) {
-    val words = File("words.txt").readLines().filterNot { it.length != it.toSet().size }.map { it.lowercase() }.toList()
+    val words = File("words.txt").readLines().filterNot { it.length != it.toSet().size }.toList()
     val elapsed = measureTimeMillis {
       process("", words)?.let { println ("Solution: ${it.chunked(5)}") }
     }
