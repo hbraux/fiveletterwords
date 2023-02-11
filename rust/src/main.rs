@@ -1,29 +1,32 @@
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::path::Path;
+use std::time::Instant;
 
 static LETTERS: &[u8] = "etaonrishdlfcmugypwbvkjxzq".as_bytes();
 
 fn main() {
     let words: Vec<String> = read_lines("../words.txt").expect("cannot read file")
         .into_iter().filter(|w| !has_duplicate(w)).collect();
-    println!("{} words", words.len());
-    let res = process("", words);
-    println!("Result: {}", res);
+    let before = Instant::now();
+    let res = process("".to_string(), words);
+    println!("Result: {} in {:.2?} s", res, before.elapsed());
 }
 
-fn process(current: &str, words: Vec<String>) -> &str {
+fn process(current: String, words: Vec<String>) -> String {
     if current.len() >= 20 {
         return current;
     }
-    let cbytes = current.as_bytes();
-    let letter = LETTERS.into_iter().find(|b| !cbytes.contains(b)).unwrap();
+    let letter = LETTERS.into_iter().find(|b| !current.as_bytes().contains(b)).unwrap();
     let (first, second): (Vec<_>, Vec<_>) = words.into_iter().partition(|w| has_letter(w, letter));
     for word in first {
-        let f = second.clone().into_iter().filter(|w| !share_letters(w, &word)).collect();
-        process(&(word + &current), f);
+        let filtered: Vec<String> = second.clone().into_iter().filter(|w| !share_letters(w, &word)).collect();
+        let found = process(current.clone() +  &word, filtered);
+        if !found.is_empty() {
+            return found;
+        }
     }
-    return "";
+    return "".to_string();
 }
 
 fn has_letter(word: &str, letter: &u8) -> bool {
