@@ -42,3 +42,6 @@ to be optimized (around 30 sec execution time!).
 Implementing Words as arrays of bytes (Words) dramatically increased the speed which is around 7ms total,
 the slower parts being reading the file!
 
+### Python
+
+Code is quite straightforward. Execution time is around 30 sec which is somehow expected

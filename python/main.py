@@ -6,18 +6,17 @@ LETTERS = "etaonrishdlfcmugypwbvkjxzq"
 
 
 def process(current, words):
-    if len(current) >= 20:
+    if len(current) >= 25:
         return current
     letter = [c for c in LETTERS if current.find(c) < 0][0]
     first, second = [], []
     for w in words:
         (first if w.find(letter) >= 0 else second).append(w)
     for word in first:
-        filtered = [w for w in second if not share_letters(word, w)]
-        found = process(current, filtered)
+        found = process(current + word, [w for w in second if not share_letters(word, w)])
         if found:
             return found
-    return ""
+    return None
 
 
 def share_letters(w1, w2):
@@ -36,7 +35,8 @@ def has_no_dup(s):
 
 if __name__ == '__main__':
     start = time.time()
-    lines = open("../words.txt").readlines()
+    with open("../words.txt") as file:
+        lines = [line.rstrip() for line in file]
     words = [w for w in lines if has_no_dup(w)]
     result = process("", words)
     print(f"RESULT {result} found in {time.time() - start} s")
