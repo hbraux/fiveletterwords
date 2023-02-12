@@ -1,6 +1,6 @@
 import scala.io.Source
 
-object Main {
+object MainS {
 
   private val LETTER_FREQUENCIES = "etaonrishdlfcmugypwbvkjxzq"
 

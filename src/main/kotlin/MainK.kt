@@ -1,9 +1,6 @@
-package test
-
 import java.io.File
 
-
-object Main {
+object MainK {
 
   @JvmStatic fun main(args : Array<String>) {
     val start = System.currentTimeMillis()
@@ -17,10 +14,9 @@ object Main {
     val letter = LETTER_FREQUENCIES.first { !current.contains(it) }
     val parts = words.partition { it.contains(letter) }
     return parts.first.firstNotNullOfOrNull {
-      word -> process(word + current, parts.second.filterNot { w -> w.any { word.contains(it) } })
+        word -> process(word + current, parts.second.filterNot { w -> w.any { word.contains(it) } })
     }
   }
 
   private const val LETTER_FREQUENCIES = "etaonrishdlfcmugypwbvkjxzq"
 }
-
