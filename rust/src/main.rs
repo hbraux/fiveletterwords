@@ -10,7 +10,7 @@ type Word = [u8];
 fn main() {
     let before = Instant::now();
     let str = read_to_string("../words.txt").expect("cannot read");
-    let words: Vec<&Word> = str.lines().filter(|w| !has_duplicate(w)).map(|x| x.as_bytes()).collect();
+    let words: Vec<&Word> = str.lines().map(|x| x.as_bytes()).filter(|w| !has_duplicate(w)).collect();
     let result = process(&[], words);
     println!("Result: {:?} found in {} ms", result.unwrap(), before.elapsed().as_millis());
 }
@@ -22,9 +22,8 @@ fn process(current: &Word, words: Vec<&Word>) -> Option<String> {
     let letter = LETTERS.into_iter().find(|b| !has_letters(current, b)).unwrap();
     let (first, second): (Vec<_>, Vec<_>) = words.into_iter().partition(|w| w.contains(letter));
     for word in first {
-        if let Some(x) = process(
-            [current, word].concat().deref(),
-            second.clone().into_iter().filter(|w| !share_letters(w, word)).collect()) {
+        let valid_words: Vec<&Word> = second.iter().cloned().filter(|w| !share_letters(w, word)).collect();
+        if let Some(x) = process([current, word].concat().deref(), valid_words) {
             return Some(x);
         }
     }
@@ -39,10 +38,7 @@ fn has_letters(word: &Word, letter: &u8) -> bool {
     (1..word.len()).any(|i| word[i] == *letter)
 }
 
-fn has_duplicate(word: &str) -> bool {
-    let bytes = word.as_bytes();
-    (1..bytes.len()).any(|i| bytes[i..].contains(&bytes[i - 1]))
-}
+fn has_duplicate(word: &Word) -> bool { (1..word.len()).any(|i| word[i..].contains(&word[i - 1])) }
 
 #[cfg(test)]
 mod tests {
@@ -50,9 +46,9 @@ mod tests {
 
     #[test]
     fn test_no_duplicate() {
-        assert_eq!(false, has_duplicate("abcde"));
-        assert_eq!(true, has_duplicate("abccd"));
-        assert_eq!(true, has_duplicate("abcda"));
+        assert_eq!(false, has_duplicate("abcde".as_bytes()));
+        assert_eq!(true, has_duplicate("abccd".as_bytes()));
+        assert_eq!(true, has_duplicate("abcda".as_bytes()));
     }
     #[test]
     fn test_share_letters() {
