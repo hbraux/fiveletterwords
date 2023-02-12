@@ -8,12 +8,8 @@ static LETTERS: &[u8] = "etaonrishdlfcmugypwbvkjxzq".as_bytes();
 
 
 fn main() {
-    let words: Vec<String> = read_lines("../words.txt").expect("cannot read file")
-        .into_iter().filter(|w| !has_duplicate(w)).collect();
-    let mut pwords: Vec<&[u8]> = Vec::new();
-    for w in words.iter() {
-        pwords.push(w.as_bytes());
-    }
+    let binding = read_lines("../words.txt").expect("cannot read file");
+    let pwords: Vec<&[u8]> = binding.iter().filter(|w| !has_duplicate(w)).map(|x| x.as_bytes()).collect();
     let before = Instant::now();
     let result = process(&[], pwords);
     println!("Result: {:?} in {} ms", result.unwrap(), before.elapsed().as_millis());
