@@ -26,12 +26,19 @@ are given below).
 
 ### Kotlin
 
-The code is small, short and easy to understand. The performances are quite good (~1500ms)
+The code is short, easy to read. The performances are quite good (~1500ms)
+
+### Scala
+
+The code is also short but a bit tricker to uunderstand. The performances are acceptale (~5600 ms)
 
 ### Rust
 
 Being a newbie, the code may not be perfect for an experienced "Rustian"
 
-First the code was extremely slow due to use of Strings and method `contain` (around 30 sec!). 
+First the code was extremely slow due to use of Strings and method `contain` which does not seem
+to be optimized (around 30 sec execution time!).
 
-Then strings were replaced by arrays of bytes and everything was extremy fast with around 3ms.
+Implementing Words as arrays of bytes (Words) dramatically increased the speed which is around 7ms total,
+the slower parts being reading the file!
+
